@@ -6,6 +6,7 @@ from psutil import cpu_percent, virtual_memory
 
 from modules.paint import green, yellow, red
 
+
 dead_counter = 0
 successful_counter = 0
 alive_counter = 0
@@ -20,6 +21,24 @@ brute_index = 0
 isScan = False
 result = []
 actual_action = str()
+
+def clear():
+    global dead_counter, successful_counter, alive_counter, index, total, scan_index, scan_total, discover_index, \
+            discover_total, brute_total, brute_index, isScan, result, actual_action
+    dead_counter = 0
+    successful_counter = 0
+    alive_counter = 0
+    index = 0
+    total = 0
+    scan_index = 0
+    scan_total = 0
+    discover_index = 0
+    discover_total = 0
+    brute_total = 0
+    brute_index = 0
+    isScan = True
+    result = []
+    actual_action = str()
 
 def get_actual_action():
     global actual_action

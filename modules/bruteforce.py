@@ -10,6 +10,17 @@ from threading import Thread
 
 
 class Brute(QThread):
+
+    devices = {
+        'Hipcam': hipcam.HipCam,
+        'Hikvision': hikvision.Hikvision,
+        'iCatch': iCatch.ICatch,
+        'Foscam': foscam.Foscam,
+        'GoAhead': goAhead.GoAhead,
+        'Tenvis': tenvis.Tenvis,
+        'Undefined': undefined.Undefined
+    }
+
     def __init__(self, brute_queue, sig, result_queue, parent=None, ):
         super(Brute, self).__init__(parent)
         self.sig = sig
@@ -23,6 +34,7 @@ class Brute(QThread):
         self.threads = []
         self.data = {}
 
+
     def stop(self):
         self.isRunning = False
         [t.join(0.1) for t in self.threads]
@@ -31,27 +43,8 @@ class Brute(QThread):
     def worker(self):
         logins = self.login_list
         passwords = self.pass_list
-        if self.data['vendor'] == 'Hipcam':
-            # print(self.data)
-            device = hipcam.HipCam(self)
-        elif self.data['vendor'] == 'Hikvision':
-            # return
-            logins = config.hik_logins_list
-            passwords = config.hik__passwords_list
-            device = hikvision.Hikvision(self)
-        elif self.data['vendor'] == 'iCatch':
-            device = iCatch.ICatch(self)
-        elif self.data['vendor'] == 'Foscam':
-            device = foscam.Foscam(self)
-        elif self.data['vendor'] == 'GoAhead':
-            device = goAhead.GoAhead(self)
-        elif self.data['vendor'] == 'Tenvis':
-            device = tenvis.Tenvis(self)
-        elif self.data['vendor'] == 'TP-LINK':
-            return
-        else:
-            device = undefined.Undefined(self)
-        # print(self.data)
+        vendor = self.data['vendor']
+        device = self.devices[vendor](self)
         if device.try_for_vuln():
             return True
         for u, usr in enumerate(logins):
@@ -95,6 +88,7 @@ class Brute(QThread):
                     state = 0 if total == 0 else (progress.get_brute_index() * 100) / total
                     self.sig.send_change_progressBar(int(state))
                     if state == 100:
+                        self.sig.change_actual_action.emit('Finish')
                         self.stop()
         return
 

@@ -90,7 +90,10 @@ class MyWin(QMainWindow):
         for line in text:
             if '	' in line:
                 content.append(line.replace('	', ':'))
+            #
             elif re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{2,5}$", line):
+                content.append(line)
+            elif re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/\d{1,2}$", line):
                 content.append(line)
 
         if len(content) == 0:
@@ -118,10 +121,7 @@ class MyWin(QMainWindow):
                 return False
 
     def click_scan(self):
-        progress.dead_counter = 0
-        progress.successful_counter = 0
-        progress.alive_counter = 0
-        progress.isScan = True
+        self.clear_terminal()
 
         self.sig = progress.Sig()
         self.sig.change_value.connect(self.update_terminal)
@@ -164,6 +164,7 @@ class MyWin(QMainWindow):
         self.ui.terminal.append(val)
 
     def clear_terminal(self):
+        progress.clear()
         self.ui.terminal.setText('')
 
     def update_progress(self, val):
@@ -219,7 +220,6 @@ class Scan(QThread):
         self.result_queue = Queue()
 
         progress.increment('total', value=len(self.HOSTS))
-
         try:
             if len(self.logins) * len(self.pwds) > 200:
                 QMessageBox.about(ipsca, 'Error', 'Too many credentials. Max.200')
@@ -245,7 +245,10 @@ class Scan(QThread):
         for line in self.HOSTS:
             if '/' in line:
                 self.single_target = False
-                [self.sorted_hosts.append(ip) for ip in IPNetwork(line)]
+                try:
+                    [self.sorted_hosts.append(ip) for ip in IPNetwork(line)]
+                except:
+                    pass
             else:
                 self.sorted_hosts.append(line)
         if self.single_target:
@@ -265,7 +268,9 @@ class Scan(QThread):
             else:
                 [self.scan_queue.put(ip) for ip in self.sorted_hosts]
                 mode = 'sock'
-                self.sig.send_signal(bold(f'[!] You are {red("NOT")} sudo (admin) user. Starting TCP--scan using sockets...'))
+                self.sig.send_signal(bold(f'[{red("ERROR")}] You are NOT sudo (admin) user.  '
+                                          f'Please, restart IPSca as sudo (admin)'))
+                return
 
         else:
             progress.increment('action', value='discovering')
@@ -309,6 +314,7 @@ class Scan(QThread):
         if not progress.isScan:
             ipsca.ui.progressBar.setValue(100)
             self.sig.send_signal(bold('[*] All jobs are finished!'))
+
 
 
 if __name__ == '__main__':
