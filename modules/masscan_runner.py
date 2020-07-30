@@ -66,8 +66,7 @@ class Masscan(Thread):
                 sys.__stdout__.write((tmp.read()).decode())
                 sys.__stdout__.flush()
             except Exception as e:
-                print(e)
-                raise e
+                print(f'{__name__} - {e}')
             finally:
                 self.sub.kill()
                 progress.increment('action', value='discovering')

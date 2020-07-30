@@ -19,7 +19,7 @@ class Logger:
             self.files.append(f)
 
     def close_all(self):
-        print('Closing files...')
+        # print('Closing files...')
         [f.close() for f in self.files]
 
 

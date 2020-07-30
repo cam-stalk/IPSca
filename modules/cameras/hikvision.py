@@ -66,7 +66,7 @@ class Hikvision:
                     return True
 
             except Exception as e:
-                print(e)
+                print(f'{__name__} - {e}')
                 return False
         else:
             return False

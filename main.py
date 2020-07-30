@@ -140,7 +140,7 @@ class MyWin(QMainWindow):
         try:
             self.scan.start()
         except Exception as e:
-            print(e)
+            print(f'{__name__} - {e}')
 
     def click_stop(self):
         progress.isScan = False
@@ -155,10 +155,10 @@ class MyWin(QMainWindow):
                 self.scan.isScan = False
                 self.ui.action_label.setText('Finish')
         except AttributeError as e:
-            print(e)
+            print(f'{__name__} - {e}')
             pass
         except Exception as e:
-            print(e)
+            print(f'{__name__} - {e}')
 
     def update_terminal(self, val):
         self.ui.terminal.append(val)
@@ -230,7 +230,7 @@ class Scan(QThread):
             QMessageBox.about(ipsca, 'Error', 'Input can only be a number')
             self.isScan = False
         except Exception as e:
-            print(e)
+            print(f'{__name__} - {e}')
             pass
 
     def update_load(self):

@@ -78,13 +78,13 @@ class Exporter(QThread):
                                 host['host'], str(ch), creds=f'{host["usr"]}:{host["pwd"]}'))
                         # self.output.append(build_html_line_iCatch(host['host'], creds=f'{host["usr"]}:{host["pwd"]}'))
             except KeyError as e:
-                print(e)
+                print(f'{__name__} - {e}')
                 pass
             except ValueError as e:
-                print(e)
+                print(f'{__name__} - {e}')
                 pass
             except Exception as e:
-                print(e)
+                print(f'{__name__} - {e}')
                 pass
 
     def write_results(self):
@@ -200,7 +200,7 @@ def build_html_line_Dlink(host, creds=''):
     return f'''<img \
     height = "176" \
     width = "320" \
-    src = "http://{creds}@{host}/image.jpg" \
+    src = "http://{creds}@{host}/image/jpeg.cgi" \
     onerror = "this.style.display='none'" \
     onclick = "window.open('http://{creds}@{host}/video/mjpg.cgi', '_blank');" />\n'''
 
@@ -212,3 +212,5 @@ def build_html_line_iCatch(host, ch, creds=''):
         src = "http://{creds}@{host}/cgi-bin/net_jpeg.cgi?ch={ch}" \
         onerror = "this.style.display='none'" \
         onclick = "window.open('http://{creds}@{host}/cgi-bin/net_jpeg.cgi?ch={ch}', '_blank');" />\n'''
+
+# def build_html_line(host, ch=None, creds='', usr='', pwd='')

@@ -8,24 +8,30 @@ import config
 from scapy.all import *
 
 
-def basic_auth_check(ip, port, usr=None, pwd='', returnall=False, path='/'):
+def basic_auth_check(ip, port, usr=None, pwd='', returnall=False, path='/', cookie=None, decode=True):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as con:
             path = path.encode()
             con.connect((ip, int(port)))
             con.settimeout(config.timeout)
             packet =  b"GET %s HTTP/1.1\r\n" % path
+            packet += b"Host: %s\r\n" % (ip + ':' + port).encode()
             packet += b"Connection: close\r\n"
             if usr:
                 token = base64.b64encode(b'%s:%s' % (usr.encode(), pwd.encode()))
-                packet += b"Authorization: Basic %s\r\n\r\n" % token
-            else:
-                packet += b"\r\n"
+                packet += b"Authorization: Basic %s\r\n" % token
+            if cookie:
+                packet += b"Cookie: %s\r\n" % cookie.encode()
+            packet += b"\r\n"
             con.send(packet)
+            # return con.recv(1024).decode()
             if returnall:
-                # print(con.recv(1024))
-                # return recvall(con, 4096)
-                return con.recv(1024).decode('utf-8', 'replace')
+                if decode:
+                    return con.recv(1024).decode('utf-8', 'replace')
+                else:
+                    print('!!!!!!!!!!!!!!!!!!!')
+                    data = con.recv(1024).decode()
+                    return data
             else:
                 data = (con.recv(12)).decode('utf-8', 'replace').split(' ')
         # print(data)
@@ -41,7 +47,7 @@ def basic_auth_check(ip, port, usr=None, pwd='', returnall=False, path='/'):
     except socket.timeout:
         pass
     except Exception as e:
-        print(ip + ' - ' + str(e))
+        print(f'{__name__} - {ip} - {e}')
         return False
 
 def recvall(sock, n):

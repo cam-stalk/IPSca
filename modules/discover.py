@@ -55,7 +55,6 @@ class Discover(QThread):
                        'resp': None,
                        'msg': None}
     def stop(self):
-        print('DISCOVER - STOP!!!')
         self.isRunning = False
 
     def run(self):
@@ -81,6 +80,7 @@ class Discover(QThread):
 
             self.sig.change_progress_str.emit(bold(f'[{index}/{progress.get_discover_total()}] {self.host}'))
             response = get(f'http://{self.host}', timeout=self.TIMEOUT, headers=self.headers)
+            # print(response.headers)
             self.result.update({'host': response.url.split('/')[2]})
             progress.increment('alive')
             self.sig.change_alive_counter.emit(str(index - dead_counter))
@@ -130,73 +130,6 @@ class Discover(QThread):
                 return
             with Lock():
                 self.result_queue.put(self.result)
-                # print(prepare_html(response))
-
-
-            # if ipsca.brute_enable:
-
-            #         if vendor == 'Hikvision':
-            #             #brute = Brute_Hik(ipsca.report[host]['ip'], ipsca.report[host]['authenticate'])дщ
-            #             brute = Brute_Hik(ipsca.report[self.host]['url'], ipsca.report[self.host]['authservice'])
-            #             # print(ipsca.report[host])
-            #             if brute.vuln:
-            #                 progress.send_signal(f"[{gray(bold(host))}]{result}{red(bold('VULN'))}")
-            #                 ipsca.report[host].update({'VULN': True})
-            #                 return
-            #         elif vendor == 'Foscam':
-            #             brute = Brute_Foscam(ipsca.report[host]['url'])
-            #         elif vendor == 'Netwave':
-            #             response = requests.get(f'{ipsca.report[host]["url"]}get_camera_params.cgi', timeout=self.TIMEOUT, headers=self.headers)
-            #             ipsca.report[host].update({'url': response.url})
-            #             brute = Brute_GET(ipsca.report[host])
-            #         elif vendor == 'Dahua':
-            #             response = requests.get(f'http://{ipsca.report[host]["url"]}'
-            #                                     f'/current_config/passwd',
-            #                                     timeout=self.TIMEOUT, headers=self.headers)
-            #             response2 = requests.get(f'http://{ipsca.report[host]["url"]}'
-            #                                     f'/current_config/Account1',
-            #                                     timeout=self.TIMEOUT, headers=self.headers)
-            #             if response.status_code == 200 or response2.status_code == 200:
-            #                 ipsca.report[host].update({'VULN': True})
-            #                 brute = False
-            #                 creds = ''
-            #             else:
-            #                 #ipsca.report[host].update({'url': response.url})
-            #                 #brute = Brute_GET(ipsca.report[host], self.logins, self.pwds)
-            #                 pass
-            #         else:
-            #             brute = Brute_GET(ipsca.report[host], self.logins, self.pwds)
-            #         if brute:
-            #             brute.start()
-            #             creds = brute.make_results()
-            #         if len(creds) > 0 and ':' in creds:
-            #             usr, pwd = creds.split(':')
-            #             ipsca.successful_counter += 1
-            #             ipsca.report[host].update({'usr': usr, 'pwd': pwd})
-            #             if ipsca.report[host]['authservice'] == 'DNVRS-Webs':
-            #                 ipsca.report[host].update({'numb_of_ch': brute.get_channels_number()})
-            #             creds = f'[{creds}]'
-            #     else:
-            #         creds = ''
-            #     if ipsca.report[host]['VULN']:
-            #         vuln = '[VULN]'
-            #     self.send_signal(f"[{gray(bold(host))}]{result}{red(bold(vuln))}{red(creds)}")
-            # elif 'WWW-Authenticate' in str(response.headers) and not ipsca.IoTOnly:
-            #     #print(response.headers['WWW-Authenticate'])
-            #     ipsca.report[host] = {'ip': host, 'authenticate': str(response.headers['WWW-Authenticate'])}
-            #     if ipsca.brute_enable:
-            #         brute = Brute_GET(ipsca.report[host])
-            #         brute.start()
-            #         result = f'[{brute.make_results()}]'
-            #     else:
-            #         result = ''
-            #     self.send_signal(gray(f"[{gray(bold(host))}][{(response.headers['WWW-Authenticate']).split(',')[0]}] {result}"))
-            # elif 'Server' in str(response.headers) and not ipsca.IoTOnly:
-            #     self.send_signal(f"[{gray(bold(host))}] {yellow(prepare_html(response))}")
-            #     # print(prepare_html(response))
-            # elif not ipsca.IoTOnly:
-            #     self.send_signal(f"[{gray(bold(host))}] {yellow(prepare_html(response))}")
-            #     # print(prepare_html(response))
         except ConnectionError as e:
             # print(e)
             progress.increment('dead')

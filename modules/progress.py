@@ -134,7 +134,6 @@ def increment(parameter, value=0):
 
 def update_load_status(sig):
     msg = f'CPU: {colored("cpu")}%<br>Memory: {colored("mem")}%<br>Threads: {active_count()}'
-        # print('IT SHOULD WORK')
     sig.change_load_status.emit(msg)
 
 def colored(item):
