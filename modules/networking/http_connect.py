@@ -22,6 +22,7 @@ def basic_auth_check(ip, port, usr=None, pwd='', returnall=False, path='/', cook
                 packet += b"Authorization: Basic %s\r\n" % token
             if cookie:
                 packet += b"Cookie: %s\r\n" % cookie.encode()
+            packet += b"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
             packet += b"\r\n"
             con.send(packet)
             # return con.recv(1024).decode()
@@ -29,7 +30,6 @@ def basic_auth_check(ip, port, usr=None, pwd='', returnall=False, path='/', cook
                 if decode:
                     return con.recv(1024).decode('utf-8', 'replace')
                 else:
-                    print('!!!!!!!!!!!!!!!!!!!')
                     data = con.recv(1024).decode()
                     return data
             else:

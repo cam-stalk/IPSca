@@ -4,9 +4,10 @@ from PyQt5.QtCore import QThread
 # from main import *
 import config
 from modules import progress, undefined
-from modules.cameras import hipcam, hikvision, iCatch, foscam, goAhead, tenvis, dlink, netwave
 from modules.paint import *
 from threading import Thread
+from modules.cameras import hipcam, hikvision, iCatch, foscam, \
+    goAhead, tenvis, dlink, netwave, dvrRsp
 
 
 class Brute(QThread):
@@ -20,7 +21,8 @@ class Brute(QThread):
         'Tenvis': tenvis.Tenvis,
         'Undefined': undefined.Undefined,
         'D-Link': dlink.Dlink,
-        'Netwave': netwave.Netwave
+        'Netwave': netwave.Netwave,
+        'DVR RSP': dvrRsp.DvrRsp
     }
 
     def __init__(self, brute_queue, sig, result_queue, parent=None, ):
@@ -32,7 +34,7 @@ class Brute(QThread):
         self.pass_list = config.default_passwords_list
         self.isRunning = True
         self.isDone = False
-        self.maxThreads = 15
+        self.maxThreads = 30
         self.threads = []
         self.data = {}
 
